@@ -1,13 +1,34 @@
-language: java
-sudo: false
+addons:
+  artifacts:
+    debug: true
+    paths:
+    - libs.zip
+    - build.zip
+    - testbuild.zip
+    target_paths: 0ce55526-4cf8-4eeb-a329-129addc53880
+after_success:
+- ./df-build.sh
+before_install:
+- sed -i.bak -e 's|https://nexus.codehaus.org/snapshots/|https://oss.sonatype.org/content/repositories/codehaus-snapshots/|g'
+  $HOME/.m2/settings.xml
+branches: ''
 cache:
   directories:
-    - $HOME/.m2/repository
-jdk:
-  - oraclejdk8
-
+  - $HOME/.m2/repository
+  - $HOME/.m2
 install: /bin/true
-
+jdk:
+- oraclejdk8
+language: java
+notifications:
+  webhooks:
+    on_failure: always
+    on_start: always
+    on_success: always
+    urls:
+    - http://insights-portal-insights-service-webserver-prod1.public-swarm.devfactory.com/travisWebHookListener?build_id=0ce55526-4cf8-4eeb-a329-129addc53880
 script:
-  - mvn install -Dskip.unit.tests=true -Dmaven.javadoc.skip=true -V -B
-  - mvn test coveralls:report -V -P coverage 
+- mvn install -Dskip.unit.tests=true -Dmaven.javadoc.skip=true -V -B
+- mvn test coveralls:report -V -P coverage
+sudo: false
+# Modified by Insights Service at 2016-10-14 01:24:18.635252
